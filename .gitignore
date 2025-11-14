@@ -1,0 +1,21 @@
+# Claves y configuraciones privadas
+config.local.php
+.env
+.env.local
+secrets.php
+api-keys.php
+
+# Archivos de desarrollo
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*.log
+node_modules/
+vendor/          
+*.bak
+*.tmp
+
+# Bases de datos y backups
+*.sql
+*.sqlite
