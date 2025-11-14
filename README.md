@@ -8,7 +8,7 @@ Plugin para gestión de strips de controladores de IVAO Perú
 - Fichero de posiciones modificables que en principio incluye las posiciones de Perú.
 
 ## Dependencias
-- Plugin ivao-auth de la división (pdte subir a github)
+- Plugin ivao-auth de la división (https://github.com/pe-wm/ivao-auth) para verificación de usuario logueado en IVAO
 ## Instalación
 1. Descarga o clona este repositorio en `wp-content/plugins/ivao-strips`
 2. Activa el plugin desde el panel de WordPress
