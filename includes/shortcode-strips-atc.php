@@ -68,33 +68,35 @@ if (!function_exists('ivaope_strips_atc_shortcode')) {
      data-fra="<?php echo esc_attr( IVAO_STRIPS_URL.'assets/FRAs.txt' ); ?>">
 
 
-      <div class="se-header">
-        <h2 class="se-title"><?php echo esc_html($a['titulo']); ?></h2>
-        <div class="se-clock" id="<?php echo esc_attr($a['id']); ?>" aria-label="Hora UTC" title="Hora UTC">00:00:00Z</div>
+      <div class="se-sticky-header">
+        <div class="se-header">
+          <h2 class="se-title"><?php echo esc_html($a['titulo']); ?></h2>
+          <div class="se-clock" id="<?php echo esc_attr($a['id']); ?>" aria-label="Hora UTC" title="Hora UTC">00:00:00Z</div>
+        </div>
+
+        <!-- Selector de Posición (obligatorio) -->
+        <div class="se-toolbar" style="flex-wrap:wrap">
+          <label for="<?php echo esc_attr($uid); ?>_pos" style="font-weight:600">Posición:</label>
+          <select id="<?php echo esc_attr($uid); ?>_pos" class="se-select" required>
+            <option value="">— Selecciona tu posición —</option>
+          </select>
+
+          <button type="button" class="se-btn add-arr" disabled>Agregar Llegada</button>
+          <button type="button" class="se-btn add-dep" disabled>Agregar Salida</button>
+        </div>
+
+        <!-- METAR -->
+        <div class="se-metar">
+          <label for="<?php echo esc_attr($uid); ?>_metar_in" class="se-metar-label">METAR:</label>
+          <input id="<?php echo esc_attr($uid); ?>_metar_in" class="se-metar-input" type="text"
+                 inputmode="latin" placeholder="" maxlength="4" pattern="[A-Za-z]{4}"
+                 aria-label="Código ICAO (4 letras)" />
+          <button type="button" class="se-metar-btn" disabled>Obtener METAR</button>
+          <div class="se-metar-msg" aria-live="polite"></div>
+        </div>
+
+        <div class="se-transfer-status" style="text-align:center;font:600 14px/1.3 system-ui,-apple-system,Segoe UI,Roboto;margin-top:6px;min-height:1.4em;"></div>
       </div>
-
-      <!-- Selector de Posición (obligatorio) -->
-      <div class="se-toolbar" style="flex-wrap:wrap">
-        <label for="<?php echo esc_attr($uid); ?>_pos" style="font-weight:600">Posición:</label>
-        <select id="<?php echo esc_attr($uid); ?>_pos" class="se-select" required>
-          <option value="">— Selecciona tu posición —</option>
-        </select>
-
-        <button type="button" class="se-btn add-arr" disabled>Agregar Llegada</button>
-        <button type="button" class="se-btn add-dep" disabled>Agregar Salida</button>
-      </div>
-
-      <!-- METAR -->
-      <div class="se-metar">
-        <label for="<?php echo esc_attr($uid); ?>_metar_in" class="se-metar-label">METAR:</label>
-        <input id="<?php echo esc_attr($uid); ?>_metar_in" class="se-metar-input" type="text"
-               inputmode="latin" placeholder="" maxlength="4" pattern="[A-Za-z]{4}"
-               aria-label="Código ICAO (4 letras)" />
-        <button type="button" class="se-metar-btn" disabled>Obtener METAR</button>
-        <div class="se-metar-msg" aria-live="polite"></div>
-      </div>
-
-      <div class="se-transfer-status" style="text-align:center;font:600 14px/1.3 system-ui,-apple-system,Segoe UI,Roboto;margin-top:6px;min-height:1.4em;"></div>
 
       <div class="se-stage" aria-disabled="true" style="opacity:.5; pointer-events:none;"></div>
     </div>
