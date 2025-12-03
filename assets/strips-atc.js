@@ -324,6 +324,7 @@
 			note.textContent = '';
 			note.style.setProperty('color', '#000', 'important');                 // opcional
 			note.style.setProperty('-webkit-text-fill-color', '#000', 'important'); // CLAVE
+			note.style.textTransform = 'uppercase'; // Forzar mayúsculas
 			if (isArr && (idx === 5 || idx === 19)) {
 				note.style.fontSize = '54px'; note.style.lineHeight = '1.2';
 			}
@@ -340,6 +341,28 @@
 					else note.textContent = 'B';
 				});
 			}
+			
+			// Convertir a mayúsculas al escribir
+			note.addEventListener('input', (e) => {
+				const sel = window.getSelection();
+				const range = sel.rangeCount > 0 ? sel.getRangeAt(0) : null;
+				const offset = range ? range.startOffset : 0;
+				
+				note.textContent = note.textContent.toUpperCase();
+				
+				// Restaurar posición del cursor
+				if (range && note.firstChild) {
+					try {
+						range.setStart(note.firstChild, Math.min(offset, note.textContent.length));
+						range.collapse(true);
+						sel.removeAllRanges();
+						sel.addRange(range);
+					} catch (e) {
+						// Ignorar errores de rango
+					}
+				}
+			});
+			
 			layer.appendChild(note);
 		});
 
@@ -905,26 +928,41 @@
 						const res = await fetch(url, {
 							method: 'POST', credentials: 'same-origin',
 							headers: { 'Content-Type': 'application/json' },
-							body: JSON.stringify({ to, payload })
+							body: JSON.stringify({ to, payload }),
+							signal: AbortSignal.timeout(10000) // Timeout 10 segundos
 						});
 						if (!res.ok) {
 							const t = await res.text();
-							if (transferStatus) { transferStatus.style.color = '#b00020'; transferStatus.textContent = `Error ${res.status}: ${t || ''}`; }
-							return;
+							if (transferStatus) { 
+								transferStatus.style.color = '#b00020'; 
+								transferStatus.textContent = `❌ Error ${res.status}: Transferencia fallida. Strip conservado.`; 
+								setTimeout(() => transferStatus.textContent = '', 5000);
+							}
+							toast(`Transferencia fallida: ${t || 'Error del servidor'}`, true);
+							return; // NO eliminar el strip
 						}
 						if (transferStatus) {
 							transferStatus.style.color = '#007700';
-							transferStatus.textContent = `Enviado a ${to} ✅`;
+							transferStatus.textContent = `✅ Transferido a ${to}`;
 							setTimeout(() => transferStatus.textContent = '', 3000);
 						}
+						toast(`Strip transferido a ${to} correctamente`);
 
-						// Quita el strip y reordena para evitar solapados
+						// ✅ SOLO si todo OK, eliminar el strip
 						layer.remove();
 						reflowAll(stage);
-						// Guarda tras transferencia
 						saveSessionState(endpoints, stage, currentPos);
 					} catch (e) {
-						if (transferStatus) { transferStatus.style.color = '#b00020'; transferStatus.textContent = `Error de red: ${e && e.message || e}`; }
+						const errorMsg = e.name === 'TimeoutError' 
+							? 'Timeout: El servidor no respondió' 
+							: `Error de red: ${e.message || e}`;
+						if (transferStatus) { 
+							transferStatus.style.color = '#b00020'; 
+							transferStatus.textContent = `❌ ${errorMsg}. Strip conservado.`; 
+							setTimeout(() => transferStatus.textContent = '', 5000);
+						}
+						toast(`Transferencia fallida: ${errorMsg}. Strip no eliminado.`, true);
+						if (DEBUG) console.error('[transfer] Error:', e);
 					}
 				}
 			});
@@ -1774,7 +1812,7 @@
 
 				// Changed: Consider position locked if file exists and owner is different
 				const isDifferentOwner = (result.owner && result.owner !== ivaoId) ? true : false;
-				const isActive = typeof result.age === 'number' && result.age < 300;
+				const isActive = typeof result.age === 'number' && result.age < 600; // 10 minutes timeout
 
 				if (DEBUG) console.info('[poslock] status for', posStr, {
 					isActive,
